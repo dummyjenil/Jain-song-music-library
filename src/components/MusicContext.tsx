@@ -7,6 +7,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useToast } from '@/hooks/use-toast';
 import * as lame from '@breezystack/lamejs';
 import { blobCache } from '@/data/blobCache';
+import { useLocation } from 'react-router-dom';
 import DownloadProgress from '@/components/DownloadProgress';
 let download_cancel = true;
 
@@ -81,6 +82,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [estimatedTimeRemaining, setEstimatedTimeRemaining] = useState<number>(0);
   const [downloadFileName, setDownloadFileName] = useState<string>('');
+  const location = useLocation();
+
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
@@ -220,7 +223,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const url = URL.createObjectURL(mp3Blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `${currentSong.title} - ${currentSong.artist}.mp3`;
+        link.download = `${currentSong.title} - ${currentSong.artist}.${is_mp3 ? "mp3" : "opus"}`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -248,10 +251,10 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (!currentSong) return;
 
     // Create the share URL with song_id parameter
-    const baseUrl = window.location.origin + window.location.pathname;
+    const baseUrl = window.location.origin + location.pathname;
     const shareUrl = `${baseUrl}?type=song_id&data=${currentSong.id}`;
     const shareTitle = `${currentSong.title} by ${currentSong.artist}`;
-    const shareText = `Check out this song: ${currentSong.title} by ${currentSong.artist}\n\nLyrics:-${currentSong.lyrics[currentLanguage]}`;
+    const shareText = `Check out this song: ${currentSong.title} by ${currentSong.artist}\n\nLyrics:-\n${currentSong.lyrics[currentLanguage]}\n`;
 
     // Try to use the Web Share API
     if (navigator.share) {
