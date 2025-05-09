@@ -5,9 +5,11 @@ import SearchBar from './SearchBar';
 import { useMusic } from '@/components/MusicContext';
 import { cn } from '@/lib/utils';
 import { Heart } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const TopNav: React.FC = () => {
   const { currentTheme, toggleFavoritesView, showFavoritesOnly, resetToDefaultSong } = useMusic();
+  const isMobile = useIsMobile();
   const handleTitleClick = () => {
     resetToDefaultSong();
   };
@@ -28,6 +30,7 @@ const TopNav: React.FC = () => {
           "border-candy-secondary/30": currentTheme === 'candy',
         }
       )}
+      style={{backgroundColor:"hsla(var(--background), 50%, 50%, 0)"}}
     >
       <div className="container flex items-center justify-between h-16 max-w-screen-2xl mx-auto px-4">
         <div className="flex items-center gap-2">
@@ -48,7 +51,10 @@ const TopNav: React.FC = () => {
             Jain Song
           </div>
         </div>
-        <div className="flex-1 mx-4">
+        <div className={cn(
+          "flex-1 mx-4",
+          isMobile && "flex justify-center"
+        )}>
           <SearchBar />
         </div>
         <div className="flex items-center gap-3">
