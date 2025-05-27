@@ -8,7 +8,7 @@ import SearchTypeSelector from './SearchTypeSelector';
 
 interface DesktopSearchProps {
   searchQuery: string;
-  onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onSearchChange: (e: React.FormEvent<HTMLInputElement>) => void;
 }
 
 const DesktopSearch: React.FC<DesktopSearchProps> = ({
@@ -20,7 +20,7 @@ const DesktopSearch: React.FC<DesktopSearchProps> = ({
   return (
     <div className="relative w-full max-w-md mx-auto animate-fade-in flex">
       <div className="relative flex-1">
-        <Search 
+        <Search
           className={cn(
             "absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform",
             {
@@ -33,10 +33,12 @@ const DesktopSearch: React.FC<DesktopSearchProps> = ({
           )}
         />
         <Input
+          id="desktop-search-input"
+          name="desktop-search"
           type="search"
           placeholder="Search songs..."
           value={searchQuery}
-          onChange={onSearchChange}
+            onChange={onSearchChange}
           className={cn(
             "w-full pl-10 pr-4 h-10 text-sm transition-colors backdrop-blur-xl border-[1px] rounded-l-xl",
             {
@@ -47,9 +49,10 @@ const DesktopSearch: React.FC<DesktopSearchProps> = ({
               "bg-candy-secondary/50 placeholder:text-candy-text/60 border-candy-accent/40 focus-visible:ring-candy-accent/50": currentTheme === 'candy',
             }
           )}
+          aria-label="Search for songs, artists, or lyrics"
         />
       </div>
-      
+
       <SearchTypeSelector isDesktop />
     </div>
   );

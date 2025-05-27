@@ -1,8 +1,7 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMusic } from '@/components/MusicContext';
 import { cn } from '@/lib/utils';
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -16,20 +15,32 @@ interface SearchTypeSelectorProps {
 
 const SearchTypeSelector: React.FC<SearchTypeSelectorProps> = ({ isDesktop = false }) => {
   const { currentTheme } = useMusic();
+  const [currentSearchType, setCurrentSearchType] = useState<string>('title');
+
+  useEffect(() => {
+    const handleSearchTypeUpdate = (event: CustomEvent) => {
+      setCurrentSearchType(event.detail);
+    };
+    document.addEventListener('setSearchType', handleSearchTypeUpdate as EventListener);
+    return () => {
+      document.removeEventListener('setSearchType', handleSearchTypeUpdate as EventListener);
+    };
+  }, []);
 
   const handleSearchTypeChange = (value: string) => {
     if (value === 'all' || value === 'title' || value === 'artist' || value === 'lyrics') {
+      setCurrentSearchType(value);
       document.dispatchEvent(new CustomEvent('setSearchType', { detail: value }));
     }
   };
 
   return (
-    <Select onValueChange={handleSearchTypeChange} defaultValue="all">
-      <SelectTrigger 
+    <Select onValueChange={handleSearchTypeChange} value={currentSearchType}>
+      <SelectTrigger
         className={cn(
           "transition-colors backdrop-blur-xl border-[1.5px] shadow-lg",
-          isDesktop ? 
-            "h-10 w-32 rounded-l-none rounded-r-xl border-[1px]" : 
+          isDesktop ?
+            "h-10 w-32 rounded-l-none rounded-r-xl border-[1px]" :
             "h-12 rounded-xl",
           {
             "bg-midnight-secondary/50 border-midnight-accent/30 focus-visible:ring-midnight-accent/50 text-midnight-text": currentTheme === 'midnight',

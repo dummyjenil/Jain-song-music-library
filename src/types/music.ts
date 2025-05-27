@@ -4,7 +4,7 @@ export type Language = 'english' | 'hindi' | 'gujarati';
 
 export interface Song {
   id: string;
-  yt_title:string;
+  yt_title: string;
   title: string;
   artist: string;
   cover: string;
@@ -15,5 +15,5 @@ export interface Song {
     gujarati: string;
   };
   similarity?: number;
-
+  searchText?: string;
 }

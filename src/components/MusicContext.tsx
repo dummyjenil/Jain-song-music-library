@@ -232,7 +232,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           toast({ title: "Download complete", description: `${currentSong.title} by ${currentSong.artist} has been downloaded` });
         }, 1000);
       }).catch((e) => {
-        console.log("hi");
         toast({
           title: "Download error",
           description: e.message,
@@ -330,11 +329,11 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
   const resetToDefaultSong = () => {
-    const defaultSong = defaultsong[0];
-    if (defaultSong) {
-      selectSong(defaultSong.id);
-      updateAudioSource(defaultSong, true);
-    }
+    // const defaultSong = defaultsong[0];
+    // if (defaultSong) {
+    //   selectSong(defaultSong.id);
+    //   updateAudioSource(defaultSong, true);
+    // }
     filterSongsByArtist('');
     setSearchQuery('');
     setShowFavoritesOnly(false);
@@ -342,7 +341,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
 
   // Update audio source when current song changes
-  React.useEffect(() => {
+  useEffect(() => {
     updateAudioSource(currentSong);
   }, [currentSong]);
 

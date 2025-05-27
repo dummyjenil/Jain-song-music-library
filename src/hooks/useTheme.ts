@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { Theme, Language } from '@/types/music';
 import { useToast } from '@/hooks/use-toast';
 
@@ -8,7 +8,12 @@ export const useTheme = () => {
   const [currentLanguage, setCurrentLanguage] = useState<Language>('gujarati');
   const { toast } = useToast();
 
+  useEffect(() => {
+    setTheme((localStorage.getItem("theme") || "candy") as Theme);
+  }, []);
+
   const setTheme = (theme: Theme) => {
+    localStorage.setItem("theme",theme);
     setCurrentTheme(theme);
   };
 

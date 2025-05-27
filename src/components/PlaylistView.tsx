@@ -15,7 +15,6 @@ interface PlaylistViewProps {
 const PlaylistView: React.FC<PlaylistViewProps> = ({ songs }) => {
   const { filteredSongs, currentSong, currentTheme, playSong, toggleLike, isLiked, showFavoritesOnly } = useMusic();
   const location = useLocation();
-
   const { toast } = useToast();
   const handleShareSong = (songId: string, e: React.MouseEvent) => {
     e.stopPropagation();

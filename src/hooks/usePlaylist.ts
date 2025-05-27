@@ -4,6 +4,7 @@ import { initSongs, getSongs } from '@/data/songs';
 import Sanscript from '@indic-transliteration/sanscript';
 import { partial_token_similarity_sort_ratio } from 'fuzzball';
 import { useSearchParams } from 'react-router-dom';
+import { useDebounce } from './useDebounce';
 
 export const usePlaylist = () => {
   const [dbSongs, setDbSongs] = useState<Song[]>([]); // <-- all songs from DB
@@ -11,65 +12,40 @@ export const usePlaylist = () => {
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchParams] = useSearchParams();
-  const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
   const [searchType, setSearchType] = useState<'title' | 'artist' | 'lyrics' | 'all'>('title');
   const [filterArtist, setFilterArtist] = useState<string | null>(null);
+  const debouncedSearchQuery = useDebounce(searchQuery, 1000);
+
+  function normalizeQuery(q: string) {
+    return Sanscript.t(Sanscript.t(Sanscript.t(q.toLowerCase(), "optitrans", "devanagari"), "devanagari", "gujarati"), "gujarati", "optitrans").toLowerCase();
+  }
+
+  function transliteration(query: string) {
+    if ((/[a-zA-Z]/).test(query)) {
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", 'https://inputtools.google.com/request?itc=gu-t-i0-und&num=1&cp=0&cs=1&ie=utf-8&oe=utf-8&app=demopage&text=' + query, false);
+      xhr.send();
+      return JSON.parse(xhr.responseText)[1][0][1][0]
+    }
+    return query
+  }
+
   function searchSongs(db: Song[], query: string, type_of_search: 'all' | 'title' | 'artist' | 'lyrics', google_transliteration: boolean) {
-    function normalizeQuery(q: string) {
-      return Sanscript.t(
-        Sanscript.t(
-          Sanscript.t(
-            q.toLowerCase(),
-            "optitrans", "devanagari"
-          ),
-          "devanagari", "gujarati"
-        ),
-        "gujarati", "optitrans"
-      ).toLowerCase();
-    }
-    function transliteration(query: string) {
-      if ((/[a-zA-Z]/).test(query)) {
-        let xhr = new XMLHttpRequest();
-        xhr.open("POST", 'https://inputtools.google.com/request?itc=gu-t-i0-und&num=1&cp=0&cs=1&ie=utf-8&oe=utf-8&app=demopage&text=' + query, false);
-        xhr.send();
-        return JSON.parse(xhr.responseText)[1][0][1][0]
-      }
-      return query
-    }
     if (type_of_search == "all" || type_of_search == "lyrics") {
       query = query.replace(/[^a-zA-Z0-9\u0900-\u097F\u0A80-\u0AFF ]/g, '');
-      query = normalizeQuery(google_transliteration ? transliteration(query) : query);
-      return db.map(song => {
-        let search_data: string[];
-        switch (type_of_search) {
-          case 'lyrics':
-            search_data = [song.lyrics.english]
-          case 'all':
-            search_data = [song.title, song.artist, song.yt_title, song.lyrics.english]
-        }
-        const similarity = partial_token_similarity_sort_ratio(search_data.join(" ").trim().replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase(), query);
-        return { ...song, similarity };
-      }).sort((a, b) => b.similarity - a.similarity).filter(song => song.similarity > 50).slice(0, 10);
+      return db.map(song => { return { ...song, similarity: partial_token_similarity_sort_ratio((type_of_search === "lyrics" ? [song.lyrics.english] : [song.title, song.artist, song.yt_title, song.lyrics.english]).join(" ").trim().replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase(), normalizeQuery(google_transliteration ? transliteration(query) : query)) }; }).sort((a, b) => b.similarity - a.similarity).filter(song => song.similarity > 50).slice(0, 10);
     }
     else if (type_of_search == "artist" || type_of_search == "title") {
-      return db.filter(song => {
-        switch (type_of_search) {
-          case "artist":
-            return song.artist.toLowerCase().includes(query);
-          case 'title':
-            return ([song.title, song.yt_title].join(" ")).toLowerCase().includes(query);
-        }
-      }).slice(0, 30);
+      return db.filter(song => (type_of_search === "artist" ? song.artist : song.title + " " + song.yt_title).toLowerCase().includes(query.toLowerCase())).slice(0, 30);
     }
+    return [];
   }
 
   useEffect(() => {
     const handleSearchTypeChange = (event: CustomEvent) => {
       setSearchType(event.detail as 'all' | 'title' | 'artist' | 'lyrics');
     };
-
     document.addEventListener('setSearchType', handleSearchTypeChange as EventListener);
-
     return () => {
       document.removeEventListener('setSearchType', handleSearchTypeChange as EventListener);
     };
@@ -101,32 +77,10 @@ export const usePlaylist = () => {
     loadSongs();
   }, []);
 
-  useEffect(() => {
-    let timeoutsec: number;
-    if (searchType == "title" || searchType == "artist") {
-      timeoutsec = 0.5;
-    }
-    else {
-      timeoutsec = 3;
-    }
-    const timeoutId = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
-    }, timeoutsec * 1000);
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [searchQuery,filterArtist]);
-
   const filteredSongs = useMemo(() => {
-    let query = debouncedQuery.trim();
-    if (!query) {
-      if (filterArtist) {
-        return dbSongs.filter(song=>song.artist == filterArtist).slice(0,30);
-      }
-      return defaultsong;
-    }
-    return searchSongs(dbSongs, query, searchType, true);
-  }, [debouncedQuery, defaultsong, dbSongs,filterArtist]);
+    let query = debouncedSearchQuery.trim();
+    return query ? searchSongs(dbSongs, query, searchType, true) : filterArtist ? dbSongs.filter(song => song.artist === filterArtist).slice(0, 30) : defaultsong;
+  }, [debouncedSearchQuery, searchType, dbSongs, filterArtist, defaultsong]);
 
   const nextSong = () => {
     if (!currentSong) return null;
@@ -161,6 +115,7 @@ export const usePlaylist = () => {
     }
     return null;
   };
+
   const filterSongsByArtist = (artist: string) => {
     setFilterArtist(artist);
   };
