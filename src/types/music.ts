@@ -9,6 +9,7 @@ export interface Song {
   artist: string;
   cover: string;
   audioUrl: string;
+  description:string;
   lyrics: {
     english: string;
     hindi: string;

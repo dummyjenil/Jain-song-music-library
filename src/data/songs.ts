@@ -22,16 +22,16 @@ async function fetchSongsFromInternet(): Promise<Song[]> {
     throw new Error('Failed to fetch songs');
   }
   const song_list = await response.json();
-  let songs = [];
+  let songs: Song[] = [];
   let index = 0;
 
   for (let song of song_list) {
     index++;
-    let [song_title, lyrics, yt_id, yt_title, yt_view, channel_name, channel_id, audio_available] = song;
+    let [song_title, lyrics, yt_id, yt_title, yt_view, channel_name, channel_id, audio_available, yt_description, yt_pub_date, likes_count, yt_tags] = song;
     let guj = Sanscript.t(lyrics, "devanagari", "gujarati");
-    songs.push({ "id": String(index), "yt_title": yt_title, "title": song_title, "artist": channel_name ? channel_name : "Saiyam The Real Life", "cover": yt_id ? `https://img.youtube.com/vi/${yt_id}/maxresdefault.jpg` : "default.jpeg", "audioUrl": audio_available ? `https://huggingface.co/shethjenil/Jain-Songs/resolve/main/${song_title}.opus` : "default.opus", "lyrics": { "english": Sanscript.t(guj, "gujarati", "optitrans"), "hindi": Sanscript.t(guj, "gujarati", "devanagari"), "gujarati": guj } });
+    songs.push({ "id": String(index), "yt_title": yt_title, "title": song_title, "artist": channel_name ? channel_name : "Saiyam The Real Life", "cover": yt_id ? `https://img.youtube.com/vi/${yt_id}/maxresdefault.jpg` : "default.jpeg", "audioUrl": audio_available ? `https://huggingface.co/shethjenil/Jain-Songs/resolve/main/${song_title}.opus` : "default.opus", "lyrics": { "english": Sanscript.t(guj, "gujarati", "optitrans"), "hindi": Sanscript.t(guj, "gujarati", "devanagari"), "gujarati": guj }, "description": yt_description + "\n" + yt_tags.split(",").join(" ") });
   }
-  return songs as Song[];
+  return songs;
 }
 
 // Save songs into IndexedDB

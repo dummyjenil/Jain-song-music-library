@@ -12,7 +12,7 @@ export const usePlaylist = () => {
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchParams] = useSearchParams();
-  const [searchType, setSearchType] = useState<'title' | 'artist' | 'lyrics' | 'all'>('title');
+  const [searchType, setSearchType] = useState<'info' | 'artist' | 'lyrics' | 'all' | 'title'>('title');
   const [filterArtist, setFilterArtist] = useState<string | null>(null);
   const debouncedSearchQuery = useDebounce(searchQuery, 1000);
 
@@ -30,20 +30,30 @@ export const usePlaylist = () => {
     return query
   }
 
-  function searchSongs(db: Song[], query: string, type_of_search: 'all' | 'title' | 'artist' | 'lyrics', google_transliteration: boolean) {
+  function searchSongs(db: Song[], query: string, type_of_search: 'all' | 'info' | 'artist' | 'lyrics' | 'title', google_transliteration: boolean) {
     if (type_of_search == "all" || type_of_search == "lyrics") {
       query = query.replace(/[^a-zA-Z0-9\u0900-\u097F\u0A80-\u0AFF ]/g, '');
-      return db.map(song => { return { ...song, similarity: partial_token_similarity_sort_ratio((type_of_search === "lyrics" ? [song.lyrics.english] : [song.title, song.artist, song.yt_title, song.lyrics.english]).join(" ").trim().replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase(), normalizeQuery(google_transliteration ? transliteration(query) : query)) }; }).sort((a, b) => b.similarity - a.similarity).filter(song => song.similarity > 50).slice(0, 10);
+      return db.map(song => { return { ...song, similarity: partial_token_similarity_sort_ratio((type_of_search === "lyrics" ? [song.lyrics.english] : [song.title, song.artist, song.yt_title, song.lyrics.english, song.description]).join(" ").trim().replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase(), normalizeQuery(google_transliteration ? transliteration(query) : query)) }; }).sort((a, b) => b.similarity - a.similarity).filter(song => song.similarity > 50).slice(0, 10);
     }
-    else if (type_of_search == "artist" || type_of_search == "title") {
-      return db.filter(song => (type_of_search === "artist" ? song.artist : song.title + " " + song.yt_title).toLowerCase().includes(query.toLowerCase())).slice(0, 30);
+    else if (type_of_search == "artist" || type_of_search == "info" || type_of_search == "title") {
+      return db.filter(song => (type_of_search === "artist" ? song.artist : type_of_search === "title" ? song.title : song.title + " " + song.yt_title + " " + song.description).toLowerCase().includes(query.toLowerCase())).slice(0, 30);
     }
     return [];
   }
 
+  function getRandomSubset(arr:any[], n:number) {
+    const shuffled = [...arr]; // copy array
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled.slice(0, n);
+  }
+
+
   useEffect(() => {
     const handleSearchTypeChange = (event: CustomEvent) => {
-      setSearchType(event.detail as 'all' | 'title' | 'artist' | 'lyrics');
+      setSearchType(event.detail as 'all' | 'info' | 'artist' | 'lyrics' | 'title');
     };
     document.addEventListener('setSearchType', handleSearchTypeChange as EventListener);
     return () => {
@@ -69,7 +79,7 @@ export const usePlaylist = () => {
         songs4load = songsFromDB.filter((song => song.id == data_content));
       }
       else {
-        songs4load = songsFromDB.sort(() => 0.5 - Math.random()).slice(0, 10);
+        songs4load = getRandomSubset(songsFromDB, 15);
       }
       setdefaultsong(songs4load);
       setCurrentSong(songs4load[0] || null);

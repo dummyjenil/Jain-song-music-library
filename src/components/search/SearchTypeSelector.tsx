@@ -28,7 +28,7 @@ const SearchTypeSelector: React.FC<SearchTypeSelectorProps> = ({ isDesktop = fal
   }, []);
 
   const handleSearchTypeChange = (value: string) => {
-    if (value === 'all' || value === 'title' || value === 'artist' || value === 'lyrics') {
+    if (value === 'all' || value === 'info' || value === 'artist' || value === 'lyrics' || value === 'title') {
       setCurrentSearchType(value);
       document.dispatchEvent(new CustomEvent('setSearchType', { detail: value }));
     }
@@ -64,9 +64,10 @@ const SearchTypeSelector: React.FC<SearchTypeSelectorProps> = ({ isDesktop = fal
         }
       )}>
         <SelectItem value="all">All</SelectItem>
-        <SelectItem value="title">Title</SelectItem>
+        <SelectItem value="info">Info</SelectItem>
         <SelectItem value="artist">Artist</SelectItem>
         <SelectItem value="lyrics">Lyrics</SelectItem>
+        <SelectItem value="title">Title</SelectItem>
       </SelectContent>
     </Select>
   );
