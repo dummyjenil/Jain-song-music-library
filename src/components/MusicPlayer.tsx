@@ -18,8 +18,7 @@ interface MusicPlayerProps {
 }
 
 const MusicPlayer: React.FC<MusicPlayerProps> = () => {
-  const { currentTheme, filteredSongs, likedSongs, showFavoritesOnly } = useMusic();
-  const { dbSongs } = usePlaylist();
+  const { currentTheme, filteredSongs, likedSongs, showFavoritesOnly, dbSongs } = useMusic();
   const isMobile = useIsMobile();
 
   // Add smooth transition when theme changes

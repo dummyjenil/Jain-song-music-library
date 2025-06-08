@@ -46,7 +46,7 @@ const TopNav: React.FC = () => {
               }
             )}
           >
-            JainMelody
+            JainMelo
           </div>
         </div>
         <div className={cn(

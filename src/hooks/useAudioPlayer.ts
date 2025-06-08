@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Song } from '@/types/music';
 import { useToast } from '@/hooks/use-toast';
 import { blobCache } from '@/data/blobCache';
+import default_audio from '@/default.opus';
 
 export const useAudioPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -81,7 +82,7 @@ export const useAudioPlayer = () => {
     audioRef.current.pause();
 
     try {
-      const blobUrl = await fetchBlobURL(song.audioUrl);
+      const blobUrl = await fetchBlobURL(song.audioUrl || default_audio);
       audioRef.current.src = blobUrl;
       audioRef.current.load();
 

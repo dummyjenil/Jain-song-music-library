@@ -10,11 +10,11 @@ export interface Song {
   cover: string;
   audioUrl: string;
   description:string;
+  publish_date:number;
   lyrics: {
     english: string;
     hindi: string;
     gujarati: string;
   };
   similarity?: number;
-  searchText?: string;
 }

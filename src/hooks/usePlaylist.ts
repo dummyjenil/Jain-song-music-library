@@ -41,7 +41,7 @@ export const usePlaylist = () => {
     return [];
   }
 
-  function getRandomSubset(arr:any[], n:number) {
+  function getRandomSubset(arr: any[], n: number) {
     const shuffled = [...arr]; // copy array
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -62,7 +62,7 @@ export const usePlaylist = () => {
   }, []);
 
   useEffect(() => {
-    async function loadSongs() {
+    (async () => {
       await initSongs();
       const songsFromDB = await getSongs();
       setDbSongs(songsFromDB);
@@ -83,13 +83,12 @@ export const usePlaylist = () => {
       }
       setdefaultsong(songs4load);
       setCurrentSong(songs4load[0] || null);
-    }
-    loadSongs();
+    })();
   }, []);
 
   const filteredSongs = useMemo(() => {
     let query = debouncedSearchQuery.trim();
-    return query ? searchSongs(dbSongs, query, searchType, true) : filterArtist ? dbSongs.filter(song => song.artist === filterArtist).slice(0, 30) : defaultsong;
+    return query ? searchSongs(dbSongs, query, searchType, true) : filterArtist ? dbSongs.filter(song => song.artist === filterArtist).sort((a, b) => Number(b.publish_date) - Number(a.publish_date)).slice(0, 30) : defaultsong;
   }, [debouncedSearchQuery, searchType, dbSongs, filterArtist, defaultsong]);
 
   const nextSong = () => {

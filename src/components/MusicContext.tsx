@@ -23,6 +23,7 @@ interface MusicContextType {
   filteredSongs: Song[];
   likedSongs: string[];
   showFavoritesOnly: boolean;
+  dbSongs:Song[],
   setSearchQuery: (query: string) => void;
   playPause: () => void;
   nextSong: () => void;
@@ -63,6 +64,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     playSong: selectSong,
     filterSongsByArtist,
     defaultsong,
+    dbSongs
   } = usePlaylist();
 
   const {
@@ -357,6 +359,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     filteredSongs,
     likedSongs,
     showFavoritesOnly,
+    dbSongs,
     setSearchQuery,
     playPause,
     nextSong: handleNextSong,

@@ -5,6 +5,7 @@ import { Share2, Download, Music2, FileAudio } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import LikeButton from '@/components/LikeButton';
+import default_img from '@/default.jpeg';
 
 const AlbumCover: React.FC = () => {
   const {
@@ -19,7 +20,7 @@ const AlbumCover: React.FC = () => {
   if (!currentSong) return null;
 
   // Fallback to placeholder image if cover not available
-  const coverSrc = currentSong.cover || 'default.jpeg';
+  const coverSrc = currentSong.cover || default_img;
   const handleDownload = (format: 'mp3' | 'opus') => {
     setDownloadFormat(format);
     downloadCurrentSong(format == "mp3");
