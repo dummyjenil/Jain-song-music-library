@@ -3,9 +3,9 @@ import GoogleButton from 'react-google-button';
 import { useAuth } from '../context/AuthContext';
 
 const LoginButton: React.FC = () => {
-    const { login } = useAuth();
+    const { login, isLoggingIn } = useAuth();
     return (
-        <GoogleButton onClick={login} label="Sign in with Google" />
+        <GoogleButton onClick={login} disabled={isLoggingIn} label="Sign in with Google" />
     );
 };
 

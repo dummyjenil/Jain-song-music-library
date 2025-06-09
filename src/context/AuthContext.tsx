@@ -12,6 +12,7 @@ interface AuthContextType {
   user: User | null;
   login: () => void;
   logout: () => void;
+  isLoggingIn: boolean;
 }
 
 // Create the context with default values
@@ -19,12 +20,14 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   login: () => { },
   logout: () => { },
+  isLoggingIn: false,
 });
 
 // AuthProvider wraps your app and provides the auth context
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // Check user state when the component mounts
   useEffect(() => {
@@ -38,12 +41,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Manual login using Google popup
   const login = () => {
+    if (isLoggingIn) return;
+    setIsLoggingIn(true);
     signInWithPopup(auth, provider)
       .then((result) => {
         setUser(result.user);
       })
       .catch((error) => {
         console.error("Login failed:", error);
+      })
+      .finally(() => {
+        setIsLoggingIn(false);
       });
   };
 
@@ -59,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoggingIn }}>
       {authChecked ? children : null}
     </AuthContext.Provider>
   );
