@@ -9,8 +9,6 @@ import * as lame from '@breezystack/lamejs';
 import { blobCache } from '@/data/blobCache';
 import { useLocation } from 'react-router-dom';
 import DownloadProgress from '@/components/DownloadProgress';
-import { useAuth } from "../context/AuthContext";
-import { User } from 'firebase/auth';
 
 let download_cancel = true;
 
@@ -27,8 +25,6 @@ interface MusicContextType {
   likedSongs: string[];
   showFavoritesOnly: boolean;
   dbSongs: Song[],
-  user: User,
-  logout: () => void,
   setSearchQuery: (query: string) => void;
   playPause: () => void;
   nextSong: () => void;
@@ -58,7 +54,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     seek,
     updateAudioSource
   } = useAudioPlayer();
-  const { user, logout } = useAuth();
   const {
     currentSong,
     searchQuery,
@@ -368,8 +363,6 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     likedSongs,
     showFavoritesOnly,
     dbSongs,
-    user,
-    logout,
     setSearchQuery,
     playPause,
     nextSong: handleNextSong,

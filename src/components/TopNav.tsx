@@ -10,7 +10,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { deleteAllData } from '@/data/songs';
 
 const TopNav: React.FC = () => {
-  const { currentTheme, toggleFavoritesView, showFavoritesOnly, resetToDefaultSong, logout } = useMusic();
+  const { currentTheme, toggleFavoritesView, showFavoritesOnly, resetToDefaultSong } = useMusic();
   const isMobile = useIsMobile();
 
   const handleFavoritesClick = () => {
@@ -25,7 +25,6 @@ const TopNav: React.FC = () => {
   // Placeholder logout function - will be replaced when authentication is implemented
   const handleLogout = async () => {
     await deleteAllData();
-    logout();
   };
 
   return (
