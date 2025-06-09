@@ -9,8 +9,8 @@ export interface Song {
   artist: string;
   cover: string;
   audioUrl: string;
-  description:string;
-  publish_date:number;
+  description: string;
+  publish_date_seconds: number;
   lyrics: {
     english: string;
     hindi: string;

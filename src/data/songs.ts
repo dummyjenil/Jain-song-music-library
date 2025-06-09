@@ -29,7 +29,7 @@ async function fetchSongsFromInternet(): Promise<Song[]> {
     index++;
     let [song_title, lyrics, yt_id, yt_title, yt_view, channel_name, channel_id, audio_available, yt_description, yt_pub_date, likes_count, yt_tags] = song;
     let guj = Sanscript.t(lyrics, "devanagari", "gujarati");
-    songs.push({ "id": String(index), "yt_title": yt_title, "title": song_title, "artist": channel_name ? channel_name : "Jain Melody", "cover": yt_id ? `https://img.youtube.com/vi/${yt_id}/maxresdefault.jpg` : null, "audioUrl": audio_available ? `https://huggingface.co/shethjenil/Jain-Songs/resolve/main/${song_title}.opus` : null, "lyrics": { "english": Sanscript.t(guj, "gujarati", "optitrans"), "hindi": Sanscript.t(guj, "gujarati", "devanagari"), "gujarati": guj }, "description": yt_description + "\n" + yt_tags.split(",").join(" ") ,"publish_date":yt_pub_date});
+    songs.push({ "id": String(index), "yt_title": yt_title, "title": song_title, "artist": channel_name ? channel_name : "Jain Melody", "cover": yt_id ? `https://img.youtube.com/vi/${yt_id}/maxresdefault.jpg` : null, "audioUrl": audio_available ? `https://huggingface.co/shethjenil/Jain-Songs/resolve/main/${song_title}.opus` : null, "lyrics": { "english": Sanscript.t(guj, "gujarati", "optitrans"), "hindi": Sanscript.t(guj, "gujarati", "devanagari"), "gujarati": guj }, "description": yt_description + "\n" + yt_tags.split(",").join(" "), "publish_date_seconds": yt_pub_date / 1000 });
   }
   return songs;
 }
@@ -72,4 +72,13 @@ export async function getSongs(): Promise<Song[]> {
   const allSongs = await store.getAll();
   await tx.done;
   return allSongs;
+}
+
+export async function deleteAllData() {
+  const db = await getDB();
+  const tx = db.transaction(STORE_NAME, 'readwrite');
+  const store = tx.objectStore(STORE_NAME);
+  await store.clear(); // This deletes all records
+  await tx.done;
+  console.log('All data deleted');
 }

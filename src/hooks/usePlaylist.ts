@@ -88,7 +88,7 @@ export const usePlaylist = () => {
 
   const filteredSongs = useMemo(() => {
     let query = debouncedSearchQuery.trim();
-    return query ? searchSongs(dbSongs, query, searchType, true) : filterArtist ? dbSongs.filter(song => song.artist === filterArtist).sort((a, b) => Number(b.publish_date) - Number(a.publish_date)).slice(0, 30) : defaultsong;
+    return query ? searchSongs(dbSongs, query, searchType, true) : filterArtist ? dbSongs.filter(song => song.artist === filterArtist).sort((a, b) => Number(b.publish_date_seconds) - Number(a.publish_date_seconds)).slice(0, 30) : defaultsong;
   }, [debouncedSearchQuery, searchType, dbSongs, filterArtist, defaultsong]);
 
   const nextSong = () => {

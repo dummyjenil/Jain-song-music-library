@@ -12,21 +12,29 @@ import PlaylistView from '@/components/PlaylistView';
 import TopNav from '@/components/TopNav';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useToast } from '@/hooks/use-toast';
 
 interface MusicPlayerProps {
   showFavorites?: boolean;
 }
 
 const MusicPlayer: React.FC<MusicPlayerProps> = () => {
-  const { currentTheme, filteredSongs, likedSongs, showFavoritesOnly, dbSongs } = useMusic();
+  const { currentTheme, filteredSongs, likedSongs, showFavoritesOnly, dbSongs, user } = useMusic();
   const isMobile = useIsMobile();
-
+  const { toast } = useToast();
   // Add smooth transition when theme changes
   useEffect(() => {
     document.body.classList.add('theme-transition');
     return () => {
       document.body.classList.remove('theme-transition');
     };
+  }, []);
+
+  useEffect(() => {
+    toast({
+      title: `Welcome ${user.displayName}`,
+      description: `Sign in with ${user.email} email`,
+    });
   }, []);
 
   const getBackgroundStyle = () => {

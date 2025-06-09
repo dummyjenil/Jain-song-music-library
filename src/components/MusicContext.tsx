@@ -9,6 +9,9 @@ import * as lame from '@breezystack/lamejs';
 import { blobCache } from '@/data/blobCache';
 import { useLocation } from 'react-router-dom';
 import DownloadProgress from '@/components/DownloadProgress';
+import { useAuth } from "../context/AuthContext";
+import { User } from 'firebase/auth';
+
 let download_cancel = true;
 
 interface MusicContextType {
@@ -23,7 +26,9 @@ interface MusicContextType {
   filteredSongs: Song[];
   likedSongs: string[];
   showFavoritesOnly: boolean;
-  dbSongs:Song[],
+  dbSongs: Song[],
+  user: User,
+  logout: () => void,
   setSearchQuery: (query: string) => void;
   playPause: () => void;
   nextSong: () => void;
@@ -36,7 +41,7 @@ interface MusicContextType {
   isLiked: (songId: string) => boolean;
   playSongsByArtist: (artist: string) => void;
   toggleFavoritesView: () => void;
-  downloadCurrentSong: (is_mp3: boolean) => void;
+  downloadCurrentSong: (format: 'mp3' | 'opus') => void;
   shareCurrentSong: () => void;
   resetToDefaultSong: () => void;
 
@@ -53,7 +58,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     seek,
     updateAudioSource
   } = useAudioPlayer();
-
+  const { user, logout } = useAuth();
   const {
     currentSong,
     searchQuery,
@@ -206,7 +211,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return mp3Blob;
   }
 
-  const downloadCurrentSong = (is_mp3: boolean) => {
+  const downloadCurrentSong = (format: 'mp3' | 'opus') => {
+    const is_mp3 = format == "mp3";
     if (!currentSong || !currentSong.audioUrl) {
       toast({
         title: "Download error",
@@ -325,11 +331,13 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       updateAudioSource(song, true);
     }
   };
+
   const playSongsByArtist = (artist: string) => {
     if (artist) {
       filterSongsByArtist(artist);
     }
   };
+
   const resetToDefaultSong = () => {
     // const defaultSong = defaultsong[0];
     // if (defaultSong) {
@@ -360,6 +368,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     likedSongs,
     showFavoritesOnly,
     dbSongs,
+    user,
+    logout,
     setSearchQuery,
     playPause,
     nextSong: handleNextSong,
