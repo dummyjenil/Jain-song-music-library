@@ -1,11 +1,24 @@
 import { MusicProvider } from '@/components/MusicContext';
 import MusicPlayer from '@/components/MusicPlayer';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
+import LoginPage from './LoginPage';
 
-const Index = () => {
-  return (
+const AppContent = () => {
+  const { user } = useAuth();
+  return user ? (
     <MusicProvider>
       <MusicPlayer />
     </MusicProvider>
+  ) : (
+    <LoginPage />
+  );
+};
+
+const Index = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 };
 

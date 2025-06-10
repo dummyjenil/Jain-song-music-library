@@ -8,10 +8,12 @@ import { Heart, LogOut } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { deleteAllData } from '@/data/songs';
+import { useAuth } from '@/context/AuthContext';
 
 const TopNav: React.FC = () => {
   const { currentTheme, toggleFavoritesView, showFavoritesOnly, resetToDefaultSong } = useMusic();
   const isMobile = useIsMobile();
+  const { logout } = useAuth();
 
   const handleFavoritesClick = () => {
     toggleFavoritesView();
@@ -25,6 +27,7 @@ const TopNav: React.FC = () => {
   // Placeholder logout function - will be replaced when authentication is implemented
   const handleLogout = async () => {
     await deleteAllData();
+    logout();
   };
 
   return (
