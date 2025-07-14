@@ -1,10 +1,11 @@
-import { Song } from '@/types/music';
+import { Song, Song_DATA_CSV } from '@/types/music';
 import Sanscript from '@indic-transliteration/sanscript';
 import { openDB } from 'idb';
+import Papa from 'papaparse';
 
 const DB_NAME = 'JainSongsDB';
 const STORE_NAME = 'songsStore';
-const SONGS_URL = 'songs.json';
+const SONGS_URL = 'data.csv';
 
 async function getDB() {
   return openDB(DB_NAME, 1, {
@@ -21,15 +22,14 @@ async function fetchSongsFromInternet(): Promise<Song[]> {
   if (!response.ok) {
     throw new Error('Failed to fetch songs');
   }
-  const song_list = await response.json();
+  const song_list = Papa.parse(await response.text(), {header: true,skipEmptyLines: true,}).data as Song_DATA_CSV[];
   let songs: Song[] = [];
   let index = 0;
 
   for (let song of song_list) {
     index++;
-    let [song_title, lyrics, yt_id, yt_title, yt_view, channel_name, channel_id, audio_available, yt_description, yt_pub_date, likes_count, yt_tags] = song;
-    let guj = Sanscript.t(lyrics, "devanagari", "gujarati");
-    songs.push({ "id": String(index), "yt_title": yt_title, "title": song_title, "artist": channel_name ? channel_name : "Jain Melody", "cover": yt_id ? `https://img.youtube.com/vi/${yt_id}/maxresdefault.jpg` : null, "audioUrl": audio_available ? `https://huggingface.co/shethjenil/Jain-Songs/resolve/main/${song_title}.opus` : null, "lyrics": { "english": Sanscript.t(guj, "gujarati", "optitrans"), "hindi": Sanscript.t(guj, "gujarati", "devanagari"), "gujarati": guj }, "description": yt_description + "\n" + yt_tags.split(",").join(" "), "publish_date_seconds": yt_pub_date / 1000 });
+    let guj = Sanscript.t(song.lyrics, "devanagari", "gujarati");
+    songs.push({ "id": String(index), "yt_title": song.title, "title": song.song_name, "artist": song.author ? song.author : "Jain Melody", "cover": song.id ? `https://img.youtube.com/vi/${song.id}/maxresdefault.jpg` : null, "audioUrl": song.audio ? `https://huggingface.co/shethjenil/Jain-Songs/resolve/main/${song.song_name}.opus` : null, "lyrics": { "english": Sanscript.t(guj, "gujarati", "optitrans"), "hindi": Sanscript.t(guj, "gujarati", "devanagari"), "gujarati": guj }, "description": song.description + "\n" + song.tags.split(",").join(" "), "publish_date_seconds": new Date(song.publishdate).getTime() / 1000 });
   }
   return songs;
 }

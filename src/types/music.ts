@@ -18,3 +18,20 @@ export interface Song {
   };
   similarity?: number;
 }
+
+export interface Song_DATA_CSV {
+  lyrics: string;
+  audio: string;
+  song_name: string;
+  title: string;
+  description: string;
+  channelid: string;
+  view: string;
+  author: string,
+  duration: string;
+  likes: string;
+  category: string;
+  publishdate: string;
+  tags: string;
+  id: string;
+}
