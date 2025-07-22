@@ -9,6 +9,7 @@ import * as lame from '@breezystack/lamejs';
 import { blobCache } from '@/data/blobCache';
 import { useLocation } from 'react-router-dom';
 import DownloadProgress from '@/components/DownloadProgress';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 let download_cancel = true;
 
@@ -40,7 +41,8 @@ interface MusicContextType {
   downloadCurrentSong: (format: 'mp3' | 'opus') => void;
   shareCurrentSong: () => void;
   resetToDefaultSong: () => void;
-
+  showLoadingSpinner: (message?: string) => void;
+  hideLoadingSpinner: () => void;
 }
 
 const MusicContext = createContext<MusicContextType | undefined>(undefined);
@@ -64,7 +66,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     playSong: selectSong,
     filterSongsByArtist,
     defaultsong,
-    dbSongs
+    dbSongs,
+    is_Loading
   } = usePlaylist();
 
   const {
@@ -85,6 +88,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [estimatedTimeRemaining, setEstimatedTimeRemaining] = useState<number>(0);
   const [downloadFileName, setDownloadFileName] = useState<string>('');
   const location = useLocation();
+  const [isLoadingSpinnerVisible, setIsLoadingSpinnerVisible] = useState<boolean>(false);
+  const [loadingMessage, setLoadingMessage] = useState<string>("Loading...");
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -121,6 +126,15 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     localStorage.setItem('likedSongs', JSON.stringify(likedSongs));
   }, [likedSongs]);
+
+  useEffect(() => {
+    if (is_Loading) {
+      showLoadingSpinner("Start processing");
+    }
+    else {
+      hideLoadingSpinner();
+    }
+  }, [is_Loading]);
 
   // Toggle like status for a song
   const toggleLike = (songId: string) => {
@@ -344,6 +358,17 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setShowFavoritesOnly(false);
   };
 
+  // Show loading spinner with optional message
+  const showLoadingSpinner = (message: string = "Loading...") => {
+    setLoadingMessage(message);
+    setIsLoadingSpinnerVisible(true);
+  };
+
+  // Hide loading spinner
+  const hideLoadingSpinner = () => {
+    setIsLoadingSpinnerVisible(false);
+  };
+
 
   // Update audio source when current song changes
   useEffect(() => {
@@ -378,6 +403,8 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     downloadCurrentSong,
     shareCurrentSong,
     resetToDefaultSong,
+    showLoadingSpinner,
+    hideLoadingSpinner,
   };
 
   return (
@@ -393,6 +420,12 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           onCancel={cancelDownload}
         />
       )}
+      <LoadingSpinner
+        isVisible={isLoadingSpinnerVisible}
+        message={loadingMessage}
+        onCancel={hideLoadingSpinner}
+        theme={currentTheme}
+      />
     </MusicContext.Provider>
   );
 };

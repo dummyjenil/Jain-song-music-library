@@ -17,7 +17,14 @@ const AppContent = () => {
 const Index = () => {
   return (
     <AuthProvider>
-      <AppContent />
+      {/* <AppContent /> */}
+      {/* temp */}
+      <MusicProvider>
+        <MusicPlayer />
+      </MusicProvider>
+
+
+
     </AuthProvider>
   );
 };

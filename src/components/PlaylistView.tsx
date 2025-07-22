@@ -39,7 +39,7 @@ const PlaylistView: React.FC<PlaylistViewProps> = ({ songs }) => {
   if (filteredSongs.length === 0 || songs?.length === 0) {
     return (
       <div className="py-8 text-center">
-        <h3 
+        <h3
           className={cn(
             "text-xl font-bold mb-4 transition-colors",
             {
@@ -65,8 +65,8 @@ const PlaylistView: React.FC<PlaylistViewProps> = ({ songs }) => {
             }
           )}
         >
-          {showFavoritesOnly 
-            ? "No favorite songs yet. Click the heart icon on songs to add them to your favorites." 
+          {showFavoritesOnly
+            ? "No favorite songs yet. Click the heart icon on songs to add them to your favorites."
             : "No songs match your search criteria."}
         </p>
       </div>
@@ -101,7 +101,7 @@ const PlaylistView: React.FC<PlaylistViewProps> = ({ songs }) => {
           }
         )}
       >
-        {((songs?songs:filteredSongs)).map((song) => (
+        {((songs ? songs : filteredSongs)).map((song) => (
           <div
             key={song.id}
             onClick={() => playSong(song.id)}

@@ -1,4 +1,5 @@
 import { Song, Song_DATA_CSV } from '@/types/music';
+import { tf_idf_initialize } from '@/utils/tfidfRecommender';
 import Sanscript from '@indic-transliteration/sanscript';
 import { openDB } from 'idb';
 import Papa from 'papaparse';
@@ -59,6 +60,7 @@ export async function initSongs() {
     console.log('No songs in DB, fetching from internet...');
     const songs = await fetchSongsFromInternet();
     await saveSongsToDB(songs);
+    await tf_idf_initialize(songs);
   } else {
     console.log('Songs already exist in DB.');
   }
