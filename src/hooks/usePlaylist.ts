@@ -74,9 +74,9 @@ export const usePlaylist = () => {
         })
       );
       return songsWithSimilarity
-        .filter(song => song.similarity > 50)
+        .filter(song => song.similarity > 70)
         .sort((a, b) => b.similarity - a.similarity)
-        .slice(0, 10);
+        .slice(0, 30);
     }
 
     // Simple text-based search for artist/info/title
